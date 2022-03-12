@@ -29,6 +29,16 @@ def create_token():
     access_token = create_access_token(identity=username)
     return jsonify(user=username,access_token=access_token)
 
+
+@app.route("/hello", methods=["GET"])
+@cross_origin()
+@jwt_required()
+def hello():
+    response = {
+        "message": "hello world"
+    }
+    return jsonify(response)
+
 if __name__ == "__main__":
     app.run(debug=True)
 
