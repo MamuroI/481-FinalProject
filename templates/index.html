@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Recipe Searcher</title>
+</head>
+<body>
+    <h1>Test html</h1>
+    <form action="http://127.0.0.1:5000/song" method="post" name="myForm">
+        <label>Short Lyric</label>
+        <input class="w3-input" type="text" id="query" name="query">
+        <label>Score type</label>
+        <input class="w3-input" type="text" id="score" name="score">
+        <input type="button" value="Submit" onclick="submitform()">
+    </form>
+
+</body>
+</html>
+<script>
+    function submitform(){
+        let form = document.forms[0];
+        var xhr = new XMLHttpRequest();
+        xhr.open(form.method, form.action, true);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+        var j = {
+            "query":document.getElementById('query').value,
+            "score":document.getElementById('score').value,
+        };
+        xhr.responseType = "json";
+        xhr.onload = function(e) {
+            if (this.status == 200){
+                console.log('res',this.response);
+            }
+        }
+        xhr.send(JSON.stringify(j));
+    }
+</script>
