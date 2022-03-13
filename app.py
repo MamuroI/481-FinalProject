@@ -8,10 +8,14 @@ from flask_jwt_extended import JWTManager
 from flask_cors import CORS, cross_origin
 from flask_mysqldb import MySQL, MySQLdb
 
-from main import testbackend
+from main import testbackend, searchTitle, searchIngredient
 
 app = Flask(__name__)
 CORS(app)
+
+app.config['ENV'] = 'development'
+app.config['DEBUG'] = True
+app.config['TESTING'] = True
 
 app.config["JWT_SECRET_KEY"] = os.environ.get('JWT_SECRET')  # Change this!
 jwt = JWTManager(app)
@@ -83,15 +87,25 @@ def test():
     result = testbackend(data)
     return jsonify(result)
 
-@app.route("/search", methods=["POST"])
+@app.route("/searchTitle", methods=["POST"])
 @cross_origin()
 @jwt_required()
-def search():
+def searchTit():
     username = get_jwt_identity()
-    response = {
-        "message": "hello world"
-    }
-    return jsonify(response)
+    data = request.get_json()['query']
+    result = searchTitle(data)
+    # print(result)
+    return jsonify(result)
+
+@app.route("/searchIngredient", methods=["POST"])
+@cross_origin()
+@jwt_required()
+def searchIng():
+    username = get_jwt_identity()
+    data = request.get_json()['query']
+    result = searchIngredient(data)
+    # print(result)
+    return jsonify(result)
 
 # @app.route("/getFav", methods=["GET"])
 # @cross_origin()

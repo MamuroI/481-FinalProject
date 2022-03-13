@@ -13,45 +13,20 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from scipy import sparse
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
+import re
 
 def preProcess(s):
+    ps = PorterStemmer()
+    s = re.sub('[^A-za-z]', ' ', s)
     s = word_tokenize(s)
     stopwords_set = set(stopwords.words())
     stop_dict = {s: 1 for s in stopwords_set}
     s = [w for w in s if w not in stop_dict]
+    s = [ps.stem(w) for w in s]
     s = ' '.join(s)
+    s = s.translate(str.maketrans('', '', string.punctuation + u'\xa0'))
     return s
 
-def tf(text,info):
-    test = text
-    print(test)
-    cleaned_description = info
-    vectorizer = CountVectorizer(preprocessor=preProcess, ngram_range=(1, 3))
-    cleaned_description_cv = vectorizer.fit_transform(cleaned_description)
-    cleaned_description_cv.data = np.log10(cleaned_description_cv.data+1)
-    X = pd.DataFrame(cleaned_description_cv.toarray(), columns=vectorizer.get_feature_names_out())
-    extracted_word = vectorizer.fit_transform([test])
-    specific_col = vectorizer.inverse_transform(extracted_word)
-    result_col = X.columns.intersection(set(specific_col[0]))
-    result_dataframe = X[result_col]
-    sum_x_axis = result_dataframe.sum(axis=1)
-    last_result = sum_x_axis.sort_values(ascending=False)
-    last_last_result = last_result.iloc[:10]
-    return last_last_result.index[0]
-
-def tf_idf(text,info):
-    cleaned_description = info
-    vectorizer = CountVectorizer(preprocessor=preProcess, ngram_range=(1, 3))
-    X = vectorizer.fit_transform(cleaned_description)
-    idf = len(info) / (X.tocoo() > 0).sum(0)
-    X.data = np.log10(X.data + 1)
-    X = X.multiply(np.log10(idf))
-    input_tv = vectorizer.transform([text])
-    cosine_sim = cosine_similarity(X, input_tv).flatten()
-    result1 = pd.DataFrame(cosine_sim)
-    result2 = result1.sort_values([0], ascending=False)
-    result3 = result2.iloc[:5]
-    return result3.index[0]
 
 class BM25(object):
     def __init__(self, b=0.75, k1=1.6):
@@ -60,12 +35,13 @@ class BM25(object):
         self.k1 = k1
 
     def fit(self, X):
+        """ Fit IDF to documents X """
         self.vectorizer.fit(X)
         y = super(TfidfVectorizer, self.vectorizer).transform(X)
         self.avdl = y.sum(1).mean()
 
     def transform(self, q, X):
-
+        """ Calculate BM25 between query q and documents X """
         b, k1, avdl = self.b, self.k1, self.avdl
 
         # apply CountVectorizer
