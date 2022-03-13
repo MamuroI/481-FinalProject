@@ -55,6 +55,22 @@ def listFav(query):
     result2 = result.to_dict(orient='records')
     return result2
 
+def search_Fav(fav,query):
+    recipe_data = recipeData()
+    fav_df_index = pd.DataFrame(fav)
+    fav_df = recipe_data.iloc[fav_df_index['recipe_id']]
+    check = Speller(lang='en')
+    correct_textqry = check(query)
+    bm25 = BM25()
+    bm25.fit(fav_df['Title'])
+    result = bm25.transform(correct_textqry, fav_df['Title'])
+    result2 = pd.DataFrame(result)
+    result3 = result2.sort_values(by=0, axis=0, ascending=False)
+    print(result3)
+    result4 = fav_df.iloc[result3.index]
+    result5 = result4.to_dict(orient='records')
+    return result5
+
 def testbackend(text):
     testString = "this is test string with ",text
     return testString

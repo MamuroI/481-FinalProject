@@ -8,7 +8,7 @@ from flask_jwt_extended import JWTManager
 from flask_cors import CORS, cross_origin
 from flask_mysqldb import MySQL, MySQLdb
 
-from main import testbackend, searchTitle, searchIngredient, listFav
+from main import testbackend, searchTitle, searchIngredient, listFav, search_Fav
 
 app = Flask(__name__)
 CORS(app)
@@ -154,6 +154,19 @@ def removeFav():
         "message": "remove favourite success"
     }
     return jsonify(response)
+
+@app.route("/searchFav", methods=["POST"])
+@cross_origin()
+@jwt_required()
+def searchFav():
+    user = get_jwt_identity()
+    query = request.get_json()['query']
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT recipe_id FROM favourite WHERE username = (%s)", [user])
+    dataSelect = cur.fetchall()
+    mysql.connection.commit()
+    result = search_Fav(dataSelect,query)
+    return jsonify(result)
 
 if __name__ == "__main__":
     app.run(debug=True)
