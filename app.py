@@ -143,7 +143,19 @@ def addFav():
     }
     return jsonify(response)
 
-
+@app.route("/removeFav", methods=["POST"])
+@cross_origin()
+@jwt_required()
+def removeFav():
+    user = get_jwt_identity()
+    recipeIndex = request.get_json()['recipeIndex']
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM favourite WHERE username = (%s) AND recipe_id = (%s)", (user, recipeIndex))
+    mysql.connection.commit()
+    response = {
+        "message": "remove favourite success"
+    }
+    return jsonify(response)
 
 if __name__ == "__main__":
     app.run(debug=True)
