@@ -8,7 +8,7 @@ from flask_jwt_extended import JWTManager
 from flask_cors import CORS, cross_origin
 from flask_mysqldb import MySQL, MySQLdb
 
-from main import testbackend, searchTitle, searchIngredient
+from main import testbackend, searchTitle, searchIngredient, listFav
 
 app = Flask(__name__)
 CORS(app)
@@ -114,10 +114,8 @@ def getFav():
     cur.execute("SELECT recipe_id FROM favourite WHERE username = (%s)", [user])
     dataSelect = cur.fetchall()
     mysql.connection.commit()
-    response = {
-        "favourite list": dataSelect
-    }
-    return jsonify(response)
+    result = listFav(dataSelect)
+    return jsonify(result)
 
 @app.route("/addFav", methods=["POST"])
 @cross_origin()

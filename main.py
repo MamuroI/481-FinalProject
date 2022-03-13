@@ -45,6 +45,15 @@ def searchIngredient(query):
     result6 = result5.to_dict(orient='records')
     return result6
 
+def listFav(query):
+    recipe_data = recipeData()
+    print(query)
+    print(type(query))
+    test = pd.DataFrame(query)
+    print(test)
+    result = recipe_data.iloc[test['recipe_id']]
+    result2 = result.to_dict(orient='records')
+    return result2
 
 def testbackend(text):
     testString = "this is test string with ",text
