@@ -105,15 +105,19 @@ def searchIng():
     # print(result)
     return jsonify(result)
 
-# @app.route("/getFav", methods=["GET"])
-# @cross_origin()
-# @jwt_required()
-# def search():
-#     username = get_jwt_identity()
-#     response = {
-#         "message": "Favorite list"
-#     }
-#     return jsonify(response)
+@app.route("/getFav", methods=["GET"])
+@cross_origin()
+@jwt_required()
+def getFav():
+    user = get_jwt_identity()
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT recipe_id FROM favourite WHERE username = (%s)", [user])
+    dataSelect = cur.fetchall()
+    mysql.connection.commit()
+    response = {
+        "favourite list": dataSelect
+    }
+    return jsonify(response)
 
 @app.route("/addFav", methods=["POST"])
 @cross_origin()
