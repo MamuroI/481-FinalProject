@@ -91,7 +91,6 @@ def test():
 @cross_origin()
 @jwt_required()
 def searchTit():
-    username = get_jwt_identity()
     data = request.get_json()['query']
     result = searchTitle(data)
     # print(result)
@@ -101,7 +100,6 @@ def searchTit():
 @cross_origin()
 @jwt_required()
 def searchIng():
-    username = get_jwt_identity()
     data = request.get_json()['query']
     result = searchIngredient(data)
     # print(result)
@@ -116,16 +114,32 @@ def searchIng():
 #         "message": "Favorite list"
 #     }
 #     return jsonify(response)
-#
-# @app.route("/addFav", methods=["POST"])
-# @cross_origin()
-# @jwt_required()
-# def search():
-#     username = get_jwt_identity()
-#     response = {
-#         "message": "add Favorite list"
-#     }
-#     return jsonify(response)
+
+@app.route("/addFav", methods=["POST"])
+@cross_origin()
+@jwt_required()
+def addFav():
+    user = get_jwt_identity()
+    recipeIndex = request.get_json()['recipeIndex']
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT recipe_id FROM favourite WHERE username = (%s)", [user])
+    dataSelect = cur.fetchall()
+    mysql.connection.commit()
+    print(type(dataSelect))
+    if recipeIndex in str(dataSelect):
+        response = {
+            "message": "this recipe is already favourite"
+        }
+        return jsonify(response)
+    else:
+        cur.execute("INSERT INTO favourite (username,recipe_id) VALUES (%s,%s)", (user, recipeIndex))
+    mysql.connection.commit()
+    response = {
+        "message": "add favourite success"
+    }
+    return jsonify(response)
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

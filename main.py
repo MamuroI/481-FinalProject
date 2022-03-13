@@ -10,6 +10,7 @@ def recipeData():
     recipe_df = recipe_df.dropna()  #drop rows that missing any values
     recipe_df = recipe_df.rename({'Cleaned_Ingredients':'Ingredients'},axis=1)
     recipe_df = recipe_df.reset_index(drop=True)
+    recipe_df = recipe_df.reset_index() #add index in first column
     return recipe_df
 
 def searchTitle(query):
