@@ -67,7 +67,9 @@ def search_Fav(fav,query):
     result2 = pd.DataFrame(result)
     result3 = result2.sort_values(by=0, axis=0, ascending=False)
     print(result3)
-    result4 = fav_df.iloc[result3.index]
+    result3_5 = result3[result3[0] > 0]
+    result4 = fav_df.iloc[result3_5.index]
+    print(result4)
     result5 = result4.to_dict(orient='records')
     return result5
 
