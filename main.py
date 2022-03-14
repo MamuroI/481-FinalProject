@@ -5,6 +5,7 @@ from autocorrect import Speller
 def recipeData():
     recipe_df = pd.read_csv("source/Food Ingredients and Recipe Dataset with Image Name Mapping.csv", encoding="utf8", encoding_errors="ignore")
     recipe_df = recipe_df.drop_duplicates(subset="Title")
+    recipe_df = recipe_df.iloc[:10000]
     recipe_df = recipe_df.iloc[:,1:]
     del recipe_df["Ingredients"]
     recipe_df = recipe_df.dropna()  #drop rows that missing any values
@@ -24,7 +25,7 @@ def searchTitle(query):
     result2 = pd.DataFrame(result)
     result3 = result2.sort_values(by=0, axis=0, ascending=False)
     print(result3)
-    result4 = result3.head(15).index
+    result4 = result3.head(10).index
     result5 = recipe_data.iloc[result4]
     result6 = result5.to_dict(orient='records')
     return result6
@@ -40,7 +41,7 @@ def searchIngredient(query):
     result2 = pd.DataFrame(result)
     result3 = result2.sort_values(by=0, axis=0, ascending=False)
     print(result3)
-    result4 = result3.head(15).index
+    result4 = result3.head(10).index
     result5 = recipe_data.iloc[result4]
     result6 = result5.to_dict(orient='records')
     return result6
